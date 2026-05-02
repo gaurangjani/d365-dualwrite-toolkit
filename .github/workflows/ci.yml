@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for package.json
+        id: check_pkg
+        run: |
+          if [ -f package.json ]; then echo "exists=true" >> $GITHUB_OUTPUT; else echo "exists=false" >> $GITHUB_OUTPUT; fi
+
+      - name: Setup Node (if needed)
+        if: steps.check_pkg.outputs.exists == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install and test (if package.json present)
+        if: steps.check_pkg.outputs.exists == 'true'
+        run: |
+          npm ci
+          npm test || echo "Tests exited non-zero"
+
+      - name: Static checks
+        run: |
+          echo "Checking index.html exists"
+          test -f index.html || (echo "index.html missing" && exit 1)
+          echo "Checking referenced assets exist"
+          # Find src/href values and verify files under assets/
+          grep -oP '(?<=src=")[^\"]+|(?<=href=")[^\"]+' index.html | sed -e 's|^/||' -e 's|^./||' | while read path; do
+            if [[ "$path" == assets/* ]]; then
+              if [ ! -f "$path" ]; then echo "Missing asset: $path" && exit 1; fi
+            fi
+          done

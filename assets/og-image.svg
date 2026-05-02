@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" rx="24" fill="#0f172a" />
+  <g fill="#fff" font-family="Arial, Helvetica, sans-serif" font-weight="700">
+    <text x="80" y="220" font-size="64">D365 Dual-Write Toolkit</text>
+    <text x="80" y="320" font-size="36">Entity checker • Sync planner • Go-live toolkit</text>
+  </g>
+</svg>
